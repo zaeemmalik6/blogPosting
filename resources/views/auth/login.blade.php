@@ -23,17 +23,6 @@
                         <form method="POST" action="{{ route('loginUser') }}">
                             @csrf
 
-                            <div class="row mb-3">
-                                <label class="col-md-4 col-form-label text-md-end">Login as</label>
-
-                                <div class="col-md-6">
-                                    <select class="form-control" name="loginby" required>
-                                        <option value="" disabled selected>Select from below options</option>
-                                        <option value="admin"><b>Admin</b></option>
-                                        <option value="normalUser"><b>NormalUser</b></option>
-                                    </select>
-                                </div>
-                            </div>
 
                             <div class="row mb-3">
                                 <label for="email"

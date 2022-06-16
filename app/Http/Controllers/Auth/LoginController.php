@@ -51,7 +51,7 @@ class LoginController extends Controller
 
     public function loginUser(Request $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password, "type" => $request->loginby])) {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             if (auth()->user()->type == "admin") {
                 return redirect()->route('adminDashboard');
             }

@@ -17,9 +17,10 @@ return new class extends Migration
             $table->id();
             $table->text('body')->nullable();
             $table->unsignedBigInteger('reviewer_id')->nullable();
-            $table->foreign('reviewer_id')->references('id')->on('users');
+            $table->foreign('reviewer_id')->references('id')->on('users')->onDelete('cascade');
             $table->nullableMorphs('feedbackable');
             $table->timestamps();
+            $table->softDeletes()->nullable();
         });
     }
 

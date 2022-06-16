@@ -17,8 +17,8 @@ class CreateNormalUserSeeder extends Seeder
     {
         $admin = [
             'type' => 'normalUser',
-            'name' => 'Kashif Raza',
-            'email' => 'Kashif.Raza@cp.com',
+            'name' => 'user2',
+            'email' => 'user2@test.com',
             'password' => bcrypt('123456'),
         ];
         User::create($admin);

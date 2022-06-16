@@ -16,10 +16,10 @@ class CreateFeedbackSeeder extends Seeder
     public function run()
     {
         $feedback = [
-            'body' => 'test reviews',
-            'reviewer_id' => '1',
+            'body' => 'test comments',
+            'reviewer_id' => '3',
             'feedbackable_type' => 'App\Models\User',
-            'feedbackable_id' => '2'
+            'feedbackable_id' => '5'
         ];
         Feedback::create($feedback);
     }

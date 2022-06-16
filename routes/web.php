@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 
-// use App\Http\Middleware\ValidAdmin;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +27,15 @@ Route::post('/loginUser', [App\Http\Controllers\Auth\LoginController::class, 'lo
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/adminDashboard', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('adminDashboard');
-    // Route::resource('category', [App\Http\Controllers\CategoryController::class]);
+    Route::resource('/users', App\Http\Controllers\Admin\UserController::class);
+    Route::resource('/categories', App\Http\Controllers\Admin\CategoryController::class);
+    Route::resource('/posts', App\Http\Controllers\Admin\PostController::class);
+    Route::get('/trashUsers', [App\Http\Controllers\Admin\UserController::class, 'trashUsers'])->name('trashUsers');
+    Route::get('/restoreUser/{user}', [App\Http\Controllers\Admin\UserController::class, 'restoreUser'])->name('restoreUser');
+    Route::get('/trashPosts', [App\Http\Controllers\Admin\PostController::class, 'trashPosts'])->name('trashPosts');
+    Route::get('/restorePost/{post}', [App\Http\Controllers\Admin\PostController::class, 'restorePost'])->name('restorePost');
+    Route::get('/trashCategories', [App\Http\Controllers\Admin\CategoryController::class, 'trashCategories'])->name('trashCategories');
+    Route::get('/restoreCategory/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'restoreCategory'])->name('restoreCategory');
 });
 
 Route::prefix('normalUser')->middleware(['auth', 'normalUser'])->group(function () {

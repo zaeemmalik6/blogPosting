@@ -17,8 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('category_type');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes()->nullable();
         });
     }
 
