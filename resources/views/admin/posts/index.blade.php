@@ -28,6 +28,19 @@
 @endsection
 
 <br>
+
+@if (session()->has('error'))
+    <div id='msg' class='alert alert-danger'>
+        {{ session()->get('error') }}
+    </div>
+@endif
+
+@if (session()->has('error'))
+    <div id='msg' class='alert alert-danger'>
+        {{ session()->get('error') }}
+    </div>
+@endif
+
 @if (session()->has('message'))
     <div id='msg' class='alert alert-success'>
         {{ session()->get('message') }}

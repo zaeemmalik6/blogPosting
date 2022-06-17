@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Exception;
 use App\Models\User;
+use App\Models\Feedback;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Feedback;
 
 class UserController extends Controller
 {
@@ -16,8 +17,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('type', '!=', 'admin')->with('feedbacks')->orderBy('id', 'DESC')->paginate(1);
-        return view('admin.users.index')->with(['users' => $users]);
+        try {
+            $users = User::where('type', '!=', 'admin')->with('feedbacks')->orderBy('id', 'DESC')->paginate(1);
+            if (empty($users)) {
+                throw new Exception("Users not found");
+            }
+            return view('admin.users.index', compact('users'));
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -60,8 +68,15 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
-        return view('admin.users.update')->with(['user' => $user]);
+        try {
+            $user = User::find($id);
+            if (empty($user)) {
+                throw new Exception("User not found");
+            }
+            return view('admin.users.update', compact('user'));
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -73,13 +88,23 @@ class UserController extends Controller
      */
     public function update(Request $request, $user)
     {
-        $user = json_decode($user);
-        $user = User::find($user->id)->update([
-            'name' => $request->name,
-            'email' => $request->email
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required'
         ]);
-
-        return redirect('/admin/users')->with('message', 'User updated successfully');
+        try {
+            $user = json_decode($user);
+            $user = User::find($user->id)->update([
+                'name' => $request->name,
+                'email' => $request->email
+            ]);
+            if (empty($user)) {
+                throw new Exception("Can not update this user");
+            }
+            return redirect('/admin/users')->with('message', 'User updated successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -90,23 +115,42 @@ class UserController extends Controller
      */
     public function destroy($user)
     {
-        // $user = json_decode($user);
-        // dd($user);
-        Feedback::where('feedbackable_id', '=', $user)->delete();
-        $user = User::find($user)->delete();
-        return redirect('/admin/users')->with('message1', 'User deleted successfully');
+        try {
+            $user = User::find($user)->delete();
+            Feedback::where('feedbackable_id', '=', $user)->delete();
+            if (empty($user)) {
+                throw new Exception("User not found");
+            }
+            return redirect('/admin/users')->with('message1', 'User deleted successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 
     public function trashUsers()
     {
-        $users = User::onlyTrashed()->get();
-        return view('admin.users.trash')->with(['users' => $users]);
+        try {
+            $users = User::onlyTrashed()->get();
+            if (empty($users)) {
+                throw new Exception("User not found");
+            }
+            return view('admin.users.trash', compact('users'));
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 
     public function restoreUser($id)
     {
-        $reviews = Feedback::where('feedbackable_id', '=', $id)->restore();
-        $user = User::withTrashed()->find($id)->restore();
-        return redirect('/admin/users')->with('message2', 'User restored successfully');
+        try {
+            $id = User::withTrashed()->find($id)->restore();
+            Feedback::where('feedbackable_id', '=', $id)->restore();
+            if (empty($id)) {
+                throw new Exception("User not found");
+            }
+            return redirect('/admin/users')->with('message2', 'User restored successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/users')->with('error', $exception->getMessage());
+        }
     }
 }

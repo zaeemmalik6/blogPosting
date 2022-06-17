@@ -19,8 +19,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::orderBy('id', 'DESC')->paginate(3);
-        return view('admin.categories.index')->with(['categories' => $categories]);
+        try {
+            $categories = Category::orderBy('id', 'DESC')->paginate(3);
+            return view('admin.categories.index', compact('categories'));
+        } catch (Exception $exception) {
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -41,27 +45,22 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'category_type' => 'required|string',
         ]);
-        if ($validator->fails()) {
-            $data = [
-                'status' => 'error',
-                'message' => $validator->errors()->all()[0],
-            ];
-            return response()->json($data);
-        }
-
         DB::beginTransaction();
         try {
             $category = Category::create([
                 'category_type' => $request->category_type,
                 'user_id' => Auth::id(),
             ]);
+            if (empty($category)) {
+                throw new Exception("Category can not be stored");
+            }
             DB::commit();
             return redirect('/admin/categories')->with('message3', 'Category created successfully');
         } catch (Exception $exception) {
-            return redirect()->back()->with('message3', 'Category created successfully');
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
         }
     }
 
@@ -84,11 +83,15 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-
-        $category = Category::find($id);
-        if (!$category) return redirect(route('categories.index'));
-        // dd($category);
-        return view('admin.categories.update')->with(['category' => $category]);
+        try {
+            $category = Category::find($id);
+            if (empty($category)) {
+                throw new Exception("Category not found");
+            }
+            return view('admin.categories.update', compact('category'));
+        } catch (Exception $exception) {
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -100,12 +103,21 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $category)
     {
-        // dd($request->category_type);
-        $category = json_decode($category);
-        $category = Category::find($category->id)->update([
-            'category_type' => $request->category_type,
+        $request->validate([
+            'category_type' => 'required',
         ]);
-        return redirect('/admin/categories')->with('message', 'Category updated successfully');
+        try {
+            $category = json_decode($category);
+            $category = Category::find($category->id)->update([
+                'category_type' => $request->category_type,
+            ]);
+            if (empty($id)) {
+                throw new Exception("Category cannot be updated");
+            }
+            return redirect('/admin/categories')->with('message', 'Category updated successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -116,20 +128,39 @@ class CategoryController extends Controller
      */
     public function destroy($category)
     {
-        $user = json_decode($category);
-        $user = Category::find($user->id)->delete();
-        return redirect('/admin/categories')->with('message1', 'Category deleted successfully');
+        try {
+            $user = json_decode($category);
+            $user = Category::find($user->id)->delete();
+            if (empty($category)) {
+                throw new Exception("Category not found");
+            }
+            return redirect('/admin/categories')->with('message1', 'Category deleted successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
+        }
     }
 
     public function trashCategories()
     {
-        $categories = Category::onlyTrashed()->get();
-        return view('admin.categories.trash')->with(['categories' => $categories]);
+        try {
+            $categories = Category::onlyTrashed()->get();
+            if (empty($categories)) {
+                throw new Exception("Categories not found");
+            }
+            return view('admin.categories.trash')->with(['categories' => $categories]);
+        } catch (Exception $exception) {
+            return redirect('/admin/categories')->with('error', $exception->getMessage());
+        }
     }
 
     public function restoreCategory($id)
     {
-        $category = Category::withTrashed()->find($id)->restore();
-        return redirect('/admin/categories')->with('message2', 'Category restored successfully');
+        try {
+            $category = Category::withTrashed()->find($id)->restore();
+            if (empty($category)) throw new Exception("Category not found");
+
+            return redirect('/admin/categories')->with('message2', 'Category restored successfully');
+        } catch (Exception $exception) {
+        }
     }
 }

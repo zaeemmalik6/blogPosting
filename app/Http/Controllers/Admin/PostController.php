@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
@@ -18,8 +19,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('id', 'DESC')->with('feedbacks')->paginate(3);
-        return view('admin.posts.index')->with(['posts' => $posts]);
+        try {
+            $posts = Post::orderBy('id', 'DESC')->with('feedbacks')->paginate(4);
+            if (empty($posts)) {
+                throw new Exception("Post not found");
+            }
+            return view('admin.posts.index', compact('posts'));
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -29,8 +37,15 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::get();
-        return view('admin.posts.add')->with(['categories' => $categories]);
+        try {
+            $categories = Category::get();
+            if (empty($categories)) {
+                throw new Exception("Categories not found");
+            }
+            return view('admin.posts.add', compact('categories'));
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -41,15 +56,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-
-        $post = Post::create([
-            'category_id' => $request->category_id,
-            'title' => $request->title,
-            'body' => $request->body,
-            'user_id' => Auth::id(),
+        $request->validate([
+            'category_id' => 'required',
+            'title' => 'required',
+            'body' => 'required',
         ]);
-        // dd($post->user->name);
-        return redirect('/admin/posts')->with('message3', 'Post created successfully');
+
+        try {
+            $post = Post::create([
+                'category_id' => $request->category_id,
+                'title' => $request->title,
+                'body' => $request->body,
+                'user_id' => Auth::id(),
+            ]);
+            if (empty($post)) {
+                throw new Exception("Cannot store this post");
+            }
+            return redirect('/admin/posts')->with('message3', 'Post created successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -71,11 +97,16 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $post = Post::find($id);
-        $categories = Category::get();
-        // dd($categories);
-        // dd($category);
-        return view('admin.posts.update', compact('post', 'categories'));
+        try {
+            $post = Post::find($id);
+            if (empty($id)) {
+                throw new Exception("Post not found");
+            }
+            $categories = Category::get();
+            return view('admin.posts.update', compact('post', 'categories'));
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -87,19 +118,28 @@ class PostController extends Controller
      */
     public function update(Request $request, $post)
     {
-        // dd($request->all());
-
-
-        $post = json_decode($post);
-        $post = Post::find($post->id);
-
-        $post->update([
-            'category_id' => $request->category_id,
-            'title' => $request->title,
-            'body' => $request->body
-
+        $request->validate([
+            'category_id' => 'required',
+            'title' => 'required',
+            'body' => 'required',
         ]);
-        return redirect('/admin/posts')->with('message', 'Post updated successfully');
+
+        try {
+            $post = json_decode($post);
+            $post = Post::find($post->id);
+            $post->update([
+                'category_id' => $request->category_id,
+                'title' => $request->title,
+                'body' => $request->body
+
+            ]);
+            if (empty($post)) {
+                throw new Exception("Cannot update this post");
+            }
+            return redirect('/admin/posts')->with('message', 'Post updated successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -110,25 +150,42 @@ class PostController extends Controller
      */
     public function destroy($post)
     {
-        // dd($post);
-        // $post = json_decode($post);
-        $comments = Feedback::where('feedbackable_id', '=', $post)->delete();
-        $post = Post::find($post);
-        $post->delete();
-        // $post->feedbacks()->detach();
-        return redirect('/admin/posts')->with('message1', 'Post deleted successfully');
+        try {
+            Feedback::where('feedbackable_id', '=', $post)->delete();
+            $post = Post::find($post);
+            $post->delete();
+            if (empty($post)) {
+                throw new Exception("Post not found");
+            }
+            return redirect('/admin/posts')->with('message1', 'Post deleted successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 
     public function trashPosts()
     {
-        $posts = Post::onlyTrashed()->get();
-        return view('admin.posts.trash')->with(['posts' => $posts]);
+        try {
+            $posts = Post::onlyTrashed()->get();
+            if (empty($posts)) {
+                throw new Exception("Post not found");
+            }
+            return view('admin.posts.trash')->with(['posts' => $posts]);
+        } catch (Exception $exception) {
+        }
     }
 
     public function restorePost($id)
     {
-        $comments = Feedback::where('feedbackable_id', '=', $id)->restore();
-        $post = Post::withTrashed()->find($id)->restore();
-        return redirect('/admin/posts')->with('message2', 'Post restored successfully');
+        try {
+            Feedback::where('feedbackable_id', '=', $id)->restore();
+            $id = Post::withTrashed()->find($id)->restore();
+            if (empty($id)) {
+                throw new Exception("Post not found");
+            }
+            return redirect('/admin/posts')->with('message2', 'Post restored successfully');
+        } catch (Exception $exception) {
+            return redirect('/admin/posts')->with('error', $exception->getMessage());
+        }
     }
 }

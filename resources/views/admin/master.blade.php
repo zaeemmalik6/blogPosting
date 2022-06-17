@@ -47,19 +47,24 @@
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <a class="nav-link" href="{{ url('/admin/adminDashboard') }}">
+                        <a class="nav-link {{ Route::currentRouteName() == 'admin.Dashboard' ? 'active' : '' }} "
+                            href="{{ url('/admin/adminDashboard') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <a class="nav-link" href="{{ url('/admin/users') }}">
+                        <a class="nav-link {{ Route::currentRouteName() == 'users.index' ? 'active' : '' }} "
+                            href="{{ url('/admin/users') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Users
                         </a>
-                        <a class="nav-link" href="{{ url('/admin/categories') }}">
+
+                        <a class="nav-link {{ Route::currentRouteName() == 'categories.index' ? 'active' : '' }}"
+                            href="{{ url('/admin/categories') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             categories
                         </a>
-                        <a class="nav-link" href="{{ url('/admin/posts') }}">
+                        <a class="nav-link {{ Route::currentRouteName() == 'posts.index' ? 'active' : '' }} "
+                            href="{{ url('/admin/posts') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Posts
                         </a>
@@ -72,6 +77,15 @@
             </nav>
         </div>
         <div id="layoutSidenav_content">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <main>
                 @yield('content')
             </main>

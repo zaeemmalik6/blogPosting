@@ -28,6 +28,13 @@
 @endsection
 
 <br>
+
+@if (session()->has('error'))
+    <div id='msg' class='alert alert-danger'>
+        {{ session()->get('error') }}
+    </div>
+@endif
+
 @if (session()->has('message'))
     <div id='msg' class='alert alert-success'>
         {{ session()->get('message') }}
@@ -59,6 +66,8 @@
 <div class="container">
     <div class="col-lg-12">
         <br>
+        <a href="#" onclick="return confirm('Are you sure?')">Link</a>
+
         <table id="tabledata" class=" table table-striped table-hover table-bordered">
 
             <thead>

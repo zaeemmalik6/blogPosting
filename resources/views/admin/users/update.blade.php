@@ -13,10 +13,10 @@
                 </div><br>
 
                 <label><b>Name:</b></label>
-                <input type="text" name="name" class="form-control" value="{{ $user->name }}"> <br>
+                <input type="text" name="name" class="form-control" value="{{ $user->name }}" required> <br>
 
                 <label><b>Email:</b></label>
-                <input type="email" name="email" class="form-control" value="{{ $user->email }}"> <br>
+                <input type="email" name="email" class="form-control" value="{{ $user->email }}" required> <br>
 
                 <button type="submit" class="btn btn-success">Update</button>
 
