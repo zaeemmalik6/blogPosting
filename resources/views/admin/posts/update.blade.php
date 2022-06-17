@@ -15,9 +15,9 @@
 
                 <label><b>Update Category:</b></label>
                 <select class="form-select" class="form-control" name="category_id">
-                    <option value="{{ $post->category->id }}"> {{ $post->category->category_type }}</option>
                     @foreach ($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->category_type }}</option>
+                        <option {{ $post->category->category_type == $category->id ? 'selected' : '' }}
+                            value="{{ $category->id }}">{{ $category->category_type }}</option>
                     @endforeach
                 </select>
                 <br>

@@ -126,7 +126,7 @@ class PostController extends Controller
 
         try {
             $post = json_decode($post);
-            $post = Post::find($post->id);
+            $post = Post::where('category_type', '!=', $post->category_id)->find($post->id);
             $post->update([
                 'category_id' => $request->category_id,
                 'title' => $request->title,

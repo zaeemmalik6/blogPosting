@@ -95,7 +95,7 @@
                             {{ $key }}
                         </td>
                         <td>
-                            {{ $post->category->category_type }}
+                            {{ $post->category->category_type ?? '' }}
                         </td>
                         <td>
                             {{ $post->title }}

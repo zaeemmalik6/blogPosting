@@ -66,8 +66,6 @@
 <div class="container">
     <div class="col-lg-12">
         <br>
-        <a href="#" onclick="return confirm('Are you sure?')">Link</a>
-
         <table id="tabledata" class=" table table-striped table-hover table-bordered">
 
             <thead>
