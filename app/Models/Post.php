@@ -31,4 +31,9 @@ class Post extends Model
     {
         return $this->morphMany(Feedback::class, 'feedbackable');
     }
+
+    public function postMetas()
+    {
+        return $this->hasMany(PostMeta::class);
+    }
 }
