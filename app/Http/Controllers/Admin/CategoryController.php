@@ -88,7 +88,7 @@ class CategoryController extends Controller
             if (empty($category)) {
                 throw new Exception("Category not found");
             }
-            return view('admin.categories.update', compact('category'));
+            return view('admin.categories.update',  );
         } catch (Exception $exception) {
             return redirect('/admin/categories')->with('error', $exception->getMessage());
         }
